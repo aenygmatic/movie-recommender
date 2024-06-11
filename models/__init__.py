@@ -1,5 +1,3 @@
-
-
 class RatedMovie:
 
     def __init__(self, title: str, rating: float):

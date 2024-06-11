@@ -1,20 +1,32 @@
 import logging
+import os
 
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 
-from data.datasets import Datasets, load_data
+import data.downloader as dl
+import models.spark.preprocessing as sp
 from models import RatedMovie
-from models.itembased import MovieRecommendation
+from models.itembased import MovieRecommender
 
 logging.disable(logging.DEBUG)
 logging.disable(logging.INFO)
 
 
-def download_and_init_model(dataset: Datasets) -> MovieRecommendation:
-    return MovieRecommendation(data=load_data(dataset),
-                               correlation_method='pearson',
-                               correlation_min_period=100)
+def main():
+    if (not os.path.exists('../data/processed/movie_ratings.csv')
+            and os.path.exists('../data/processed/movie_correlation.csv')):
+        download_and_preprocess()
+
+    model = MovieRecommender()
+
+    movie_options = model.get_movie_titles()
+    rated_movies = [RatedMovie(title, rating) for (title, rating) in get_movie_with_rating(movie_options)]
+
+    sims = model.get_recommendations(rated_movies)
+
+    print("Recommendations:")
+    print(sims.head(20))
 
 
 def get_movie_with_rating(movie_options: list[str]):
@@ -44,20 +56,11 @@ def get_movie_with_rating(movie_options: list[str]):
             break
 
 
-def main():
-    data_options = [e.name for e in Datasets]
-    data_completer = WordCompleter(data_options, ignore_case=True)
-    selected_data = prompt(f'Select data. Options: {data_options}\n', completer=data_completer)
-
-    model = download_and_init_model(Datasets.from_str(name=selected_data))
-
-    movie_options = model.get_movie_titles()
-    rated_movies = [RatedMovie(title, rating) for (title, rating) in get_movie_with_rating(movie_options)]
-    print(f"----- My rated movies: {rated_movies}")
-    sims = model.get_recommendations(rated_movies)
-
-    print("Recommendations:")
-    print(sims.head(20))
+def download_and_preprocess():
+    data_completer = WordCompleter(dl.available_data, ignore_case=True)
+    selected_data = prompt(f'Select data. Options: {dl.available_data}\n', completer=data_completer)
+    dl.download(selected_data)
+    sp.load_and_transform()
 
 
 if __name__ == '__main__':
