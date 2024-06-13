@@ -15,9 +15,12 @@ logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
 
-def load_and_transform(dataset='ml-10m',
+def load_and_transform(dataset=None,
                        movie_correlation_csv: str = config.movie_correlation_csv(),
                        avg_ratings_csv: str = config.movie_avg_rating_csv()):
+    if dataset is None:
+        dataset = 'ml-100k'
+
     spark = SparkSession.builder \
         .appName("MoviePreprocessing") \
         .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer") \
