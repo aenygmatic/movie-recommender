@@ -25,7 +25,10 @@ class RecommendationResponse(BaseModel):
 def api(inst: StatefulService[MovieRecommender]):
     movies = APIRouter()
 
-    @movies.get("/titles")
+    @movies.get("/titles",
+                summary="Get Movie Titles",
+                description="Retrieve a list of movie titles. Optionally, filter the titles by a search string.",
+                response_description="A list of movie titles that match the search criteria.")
     async def get_titles(search: Optional[str] = None,
                          service: StatefulService[MovieRecommender] = Depends(lambda: inst)) -> List[str]:
 
@@ -36,10 +39,15 @@ def api(inst: StatefulService[MovieRecommender]):
 
         return list(titles)
 
-    @movies.post("/recommendation", response_model=RecommendationResponse)
-    async def recommend_movies(
-            request: RecommendationRequest = Body(...),
-            service: StatefulService[MovieRecommender] = Depends(lambda: inst)):
+    @movies.post("/recommendation",
+                 response_model=RecommendationResponse,
+                 summary="Get Movie Recommendations",
+                 description="Get movie recommendations based on a list of rated movies. You can specify the number "
+                             "of recommendations to retrieve.",
+                 response_description="A list of recommended movie titles.")
+    async def recommendation(request: RecommendationRequest = Body(...),
+                             service: StatefulService[MovieRecommender] = Depends(lambda: inst)):
+
         if not service.state == ServiceState.AVAILABLE:
             raise HTTPException(status_code=503, detail="Service not initialized")
         else:
