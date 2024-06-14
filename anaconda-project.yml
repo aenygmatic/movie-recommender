@@ -13,6 +13,8 @@ env_specs:
       - uvicorn
       - prompt_toolkit
       - requests
+      - pytest
+      - httpx
     channels:
       - defaults
       - conda-forge
@@ -28,6 +30,11 @@ commands:
     unix: python app/cli.py
     windows: python app/cli.py
     description: "Run the CLI application."
+
+  test:
+    unix: pytest test/
+    windows: pytest test/
+    description: "Run all tests in the test folder."
 
 
 variables:
