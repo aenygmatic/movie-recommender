@@ -1,0 +1,35 @@
+name: movie-recommender
+description: A movie recommendation system for learning.
+
+env_specs:
+  default:
+    packages:
+      - python=3.11
+      - pandas
+      - numpy
+      - jupyter
+      - pyspark
+      - fastapi
+      - uvicorn
+      - prompt_toolkit
+      - requests
+    channels:
+      - defaults
+      - conda-forge
+
+commands:
+  service:
+    unix: uvicorn app.service:app --reload
+    windows: uvicorn app.service:app --reload
+    supports_http_options: true
+    description: "Run the REST API web service."
+
+  cli:
+    unix: python app/cli.py
+    windows: python app/cli.py
+    description: "Run the CLI application."
+
+
+variables:
+  SPARK_HOME:
+    default: ${SPARK_HOME}

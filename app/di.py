@@ -3,6 +3,7 @@ import os
 from enum import Enum
 from typing import TypeVar, Generic, Callable
 
+from data import project_path
 from models.itembased import MovieRecommender
 from models.spark.preprocessing import load_and_transform
 
@@ -13,8 +14,8 @@ T = TypeVar('T')
 
 def movie_recommender():
     return StatefulService[MovieRecommender](
-        pre_init_criteria=lambda: not (os.path.exists('../data/processed/movie_ratings.csv')
-                                       and os.path.exists('../data/processed/movie_correlation.csv')),
+        pre_init_criteria=lambda: not (os.path.exists(project_path('./data/processed/movie_ratings.csv'))
+                                       and os.path.exists(project_path('./data/processed/movie_correlation.csv'))),
         pre_init_function=load_and_transform,
         init_function=MovieRecommender)
 

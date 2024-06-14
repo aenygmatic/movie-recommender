@@ -1,7 +1,11 @@
 import logging
+import os
+import sys
 
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import data.downloader as dl
 from app.di import StatefulService, ServiceState, movie_recommender
@@ -24,6 +28,13 @@ class CliApp:
 
         print("Recommendations:")
         print(sims.head(20))
+
+    def init_service(self):
+        self.service.fast_init()
+        if self.service.state is not ServiceState.AVAILABLE:
+            data_completer = WordCompleter(dl.available_data, ignore_case=True)
+            selected_data = prompt(f'Select data. Options: {dl.available_data}\n', completer=data_completer)
+            self.service.init(dataset=selected_data)
 
     @staticmethod
     def get_movie_with_rating(movie_options: list[str]):
@@ -51,13 +62,6 @@ class CliApp:
             more = prompt('Do you want to add another movie? (yes/no): ').strip().lower()
             if more not in ['yes', 'y']:
                 break
-
-    def init_service(self):
-        self.service.fast_init()
-        if self.service.state is not ServiceState.AVAILABLE:
-            data_completer = WordCompleter(dl.available_data, ignore_case=True)
-            selected_data = prompt(f'Select data. Options: {dl.available_data}\n', completer=data_completer)
-            self.service.init(dataset=selected_data)
 
 
 if __name__ == '__main__':
