@@ -26,10 +26,34 @@ Import this folder to PyCharm as an Anaconda project.
 
 # Usage
 
+## Running the CLI
+
+Run the CLI application.
+
+```
+anaconda-project run cli
+```
+
+## Running the Service
+
+Run the FastAPI web service. The application will start at port `8000`.
+
+```
+anaconda-project run service
+```
+
 ## Pre-process data
 
 Run the preprocessor to generate the data needed.
 
 ```
 python ./models/spark/preprocessing.py
+```
+
+## Running Tests
+
+Run all test.
+
+```
+anaconda-project run test
 ```
